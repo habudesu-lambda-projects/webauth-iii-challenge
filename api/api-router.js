@@ -11,7 +11,7 @@ router.get('/users', authorize, (req, res) => {
 
 router.post('/register', async (req, res) => {
     let user = req.body
-    if(user) {
+    if(user.password && user.username && user.department) {
         try {
             const hash = bcrypt.hashSync(user.password, 10)
             user.password = hash
@@ -26,10 +26,11 @@ router.post('/register', async (req, res) => {
     }  
 })
 
-router.post('login', authenticate, async (req, res) => {
+router.post('/login', async (req, res) => {
     let { username, password } = req.body
     try {
-        const user = await User.findBy(username)
+        const user = await User.getUserBy(username)
+        console.log(user)
         if(user && bcrypt.compareSync(password, user.password)) {
             const token = createToken(user)
             res.status(200).json({
